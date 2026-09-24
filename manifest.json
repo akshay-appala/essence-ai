@@ -5,7 +5,7 @@
   "description": "Summarize news articles, blogs, and webpages using AI.",
 
   "permissions": ["activeTab", "scripting"],
-
+  "host_permissions": ["http://localhost:3000/*"],
   "action": {
     "default_title": "Essence AI - Article Summarizer",
     "default_popup": "popup/popup.html"

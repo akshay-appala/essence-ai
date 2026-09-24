@@ -34,7 +34,7 @@ function getArticleText() {
 
   return text;
 }
-// Extract text from the active webpage
+
 // Extract and prepare webpage content
 async function getPageContent() {
   // Find the active tab
@@ -76,9 +76,12 @@ summarizeButton.addEventListener("click", async function () {
   try {
     statusMessage.textContent = "Reading webpage...";
     summarizeButton.disabled = true;
+    copyButton.disabled = true;
+    summaryOutput.textContent = "";
 
     // Get the webpage text
     const pageContent = await getPageContent();
+
     console.log("Extracted article length:", pageContent.length);
 
     // Check whether the page contains text
@@ -86,17 +89,41 @@ summarizeButton.addEventListener("click", async function () {
       throw new Error("No readable text found on this page.");
     }
 
-    // Display the extracted text for testing
-    summaryOutput.textContent = pageContent;
+    // Update the status message
+    statusMessage.textContent = "Generating summary...";
 
-    statusMessage.textContent = "Webpage text extracted successfully.";
+    // Send the article text and selected summary mode to the backend
+    const response = await fetch("http://localhost:3000/api/summarize", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        articleText: pageContent,
+        summaryMode: summaryMode.value,
+      }),
+    });
+
+    // Convert the backend response into a JavaScript object
+    const data = await response.json();
+
+    // Check whether the backend returned an error
+    if (!response.ok) {
+      throw new Error(data.error || "Unable to generate a summary.");
+    }
+
+    // Display the generated summary
+    summaryOutput.textContent = data.summary;
+
+    statusMessage.textContent = "Summary generated successfully.";
 
     // Enable the Copy button
     copyButton.disabled = false;
   } catch (error) {
-    statusMessage.textContent = error.message || "Unable to read this webpage.";
+    statusMessage.textContent =
+      error.message || "Unable to generate a summary.";
 
-    console.error("Page extraction failed:", error);
+    console.error("Summarization failed:", error);
   } finally {
     summarizeButton.disabled = false;
   }
