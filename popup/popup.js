@@ -5,30 +5,101 @@ const copyButton = document.getElementById("copyButton");
 const statusMessage = document.getElementById("statusMessage");
 const summaryOutput = document.getElementById("summaryOutput");
 
-// Summarize button click event
-summarizeButton.addEventListener("click", function () {
-  const selectedMode = summaryMode.value;
+// Extract article text from the webpage
+function getArticleText() {
+  // Try common selectors for the main article content
+  const selectors = [
+    "article",
+    "main",
+    ".article-content",
+    ".post-content",
+    ".entry-content",
+  ];
 
-  let summary = "";
+  for (const selector of selectors) {
+    const element = document.querySelector(selector);
 
-  // Temporary summaries for testing
-  if (selectedMode === "brief") {
-    summary = "This is a brief summary of the article.";
-  } else if (selectedMode === "bullets") {
-    summary = "• First key point\n• Second key point\n• Third key point";
-  } else if (selectedMode === "detailed") {
-    summary =
-      "This is a detailed summary of the article. It includes the main ideas and supporting details.";
+    if (element && element.innerText.trim().length > 200) {
+      return element.innerText.trim();
+    }
   }
 
-  // Display the summary
-  summaryOutput.textContent = summary;
+  // Fallback: collect paragraphs with meaningful text
+  const paragraphs = Array.from(document.querySelectorAll("p"));
 
-  // Update the status message
-  statusMessage.textContent = "Summary generated successfully.";
+  const text = paragraphs
+    .map((p) => p.innerText.trim())
+    .filter((text) => text.length > 40)
+    .join("\n");
 
-  // Enable the Copy button
-  copyButton.disabled = false;
+  return text;
+}
+// Extract text from the active webpage
+// Extract and prepare webpage content
+async function getPageContent() {
+  // Find the active tab
+  const [tab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+
+  if (!tab || !tab.id) {
+    throw new Error("No active tab found.");
+  }
+
+  // Extract article text from the webpage
+  const results = await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    func: getArticleText,
+  });
+
+  // Get the extracted text
+  const pageContent = results[0]?.result;
+
+  // Check whether text was extracted
+  if (!pageContent || !pageContent.trim()) {
+    throw new Error("No readable article text found.");
+  }
+
+  // Clean up unnecessary whitespace
+  const cleanedContent = pageContent.replace(/\s+/g, " ").trim();
+
+  // Limit the text length
+  const maxLength = 20000;
+  const limitedContent = cleanedContent.slice(0, maxLength);
+
+  return limitedContent;
+}
+
+// Summarize button click event
+summarizeButton.addEventListener("click", async function () {
+  try {
+    statusMessage.textContent = "Reading webpage...";
+    summarizeButton.disabled = true;
+
+    // Get the webpage text
+    const pageContent = await getPageContent();
+    console.log("Extracted article length:", pageContent.length);
+
+    // Check whether the page contains text
+    if (!pageContent.trim()) {
+      throw new Error("No readable text found on this page.");
+    }
+
+    // Display the extracted text for testing
+    summaryOutput.textContent = pageContent;
+
+    statusMessage.textContent = "Webpage text extracted successfully.";
+
+    // Enable the Copy button
+    copyButton.disabled = false;
+  } catch (error) {
+    statusMessage.textContent = error.message || "Unable to read this webpage.";
+
+    console.error("Page extraction failed:", error);
+  } finally {
+    summarizeButton.disabled = false;
+  }
 });
 
 // Copy button click event
@@ -37,9 +108,9 @@ copyButton.addEventListener("click", async function () {
 
   try {
     await navigator.clipboard.writeText(summary);
-    statusMessage.textContent = "Summary copied to clipboard.";
+    statusMessage.textContent = "Text copied to clipboard.";
   } catch (error) {
-    statusMessage.textContent = "Unable to copy the summary.";
+    statusMessage.textContent = "Unable to copy the text.";
     console.error("Copy failed:", error);
   }
 });
