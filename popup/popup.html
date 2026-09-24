@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Essence AI</title>
+
+    <link rel="stylesheet" href="popup.css" />
+    <script src="popup.js" defer></script>
+  </head>
+  <body>
+    <div class="app">
+      <!-- Header -->
+      <header class="app-header">
+        <h1>Essence AI</h1>
+        <p>AI-powered article summarizer</p>
+      </header>
+
+      <!-- Main Content -->
+      <main class="app-content">
+        <!-- Summary Options -->
+        <section class="summary-options">
+          <label for="summaryMode">Summary Style</label>
+
+          <select id="summaryMode">
+            <option value="brief">Brief</option>
+            <option value="bullets">Bullet Points</option>
+            <option value="detailed">Detailed</option>
+          </select>
+        </section>
+
+        <!-- Summarize Button -->
+        <button id="summarizeButton" type="button">Summarize Article</button>
+
+        <!-- Status Message -->
+        <p id="statusMessage">Ready to summarize the current page.</p>
+
+        <!-- Summary Output -->
+        <section class="summary-section">
+          <div class="summary-header">
+            <h2>Your Summary</h2>
+
+            <button id="copyButton" type="button" disabled>Copy</button>
+          </div>
+
+          <div id="summaryOutput">
+            <p>Your summary will appear here after you summarize the page.</p>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <p>Made with Essence AI</p>
+      </footer>
+    </div>
+  </body>
+</html>

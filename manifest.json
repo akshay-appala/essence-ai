@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Essence AI",
+  "version": "0.1.0",
+  "description": "Summarize news articles, blogs, and webpages using AI.",
+  "action": {
+    "default_title": "Essence AI - Article Summarizer",
+    "default_popup": "popup/popup.html"
+  }
+}
