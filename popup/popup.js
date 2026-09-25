@@ -82,8 +82,6 @@ summarizeButton.addEventListener("click", async function () {
     // Get the webpage text
     const pageContent = await getPageContent();
 
-    console.log("Extracted article length:", pageContent.length);
-
     // Check whether the page contains text
     if (!pageContent.trim()) {
       throw new Error("No readable text found on this page.");
@@ -113,7 +111,28 @@ summarizeButton.addEventListener("click", async function () {
     }
 
     // Display the generated summary
-    summaryOutput.textContent = data.summary;
+    if (summaryMode.value === "bullets") {
+      summaryOutput.textContent = "";
+
+      const list = document.createElement("ul");
+
+      const bulletPoints = data.summary
+        .split("\n")
+        .map((point) => point.trim())
+        .filter((point) => point.length > 0);
+
+      bulletPoints.forEach((point) => {
+        const listItem = document.createElement("li");
+
+        listItem.textContent = point.replace(/^[*•-]\s*/, "");
+
+        list.appendChild(listItem);
+      });
+
+      summaryOutput.appendChild(list);
+    } else {
+      summaryOutput.textContent = data.summary;
+    }
 
     statusMessage.textContent = "Summary generated successfully.";
 
@@ -131,7 +150,7 @@ summarizeButton.addEventListener("click", async function () {
 
 // Copy button click event
 copyButton.addEventListener("click", async function () {
-  const summary = summaryOutput.textContent;
+  const summary = summaryOutput.innerText;
 
   try {
     await navigator.clipboard.writeText(summary);

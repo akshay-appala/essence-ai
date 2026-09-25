@@ -149,8 +149,6 @@ ${articleText}
 
     return res.json({ summary });
   } catch (error) {
-    console.error("Summarization error:", error.message);
-
     const friendlyError = getFriendlyError(error);
 
     return res.status(friendlyError.status).json({
