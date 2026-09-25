@@ -5,6 +5,9 @@ const copyButton = document.getElementById("copyButton");
 const statusMessage = document.getElementById("statusMessage");
 const summaryOutput = document.getElementById("summaryOutput");
 
+// Backend address for local development
+const API_URL = "http://localhost:3000";
+
 // Extract article text from the webpage
 function getArticleText() {
   // Try common selectors for the main article content
@@ -91,7 +94,7 @@ summarizeButton.addEventListener("click", async function () {
     statusMessage.textContent = "Generating summary...";
 
     // Send the article text and selected summary mode to the backend
-    const response = await fetch("http://localhost:3000/api/summarize", {
+    const response = await fetch(`${API_URL}/api/summarize`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

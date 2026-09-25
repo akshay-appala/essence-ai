@@ -2,11 +2,21 @@
   "manifest_version": 3,
   "name": "Essence AI",
   "version": "0.1.0",
+  "icons": {
+    "16": "icons/16x16.png",
+    "32": "icons/32x32.png",
+    "48": "icons/48x48.png",
+    "128": "icons/128x128.png"
+  },
   "description": "Summarize news articles, blogs, and webpages using AI.",
 
   "permissions": ["activeTab", "scripting"],
   "host_permissions": ["http://localhost:3000/*"],
   "action": {
+    "default_icon": {
+      "16": "icons/16x16.png",
+      "32": "icons/32x32.png"
+    },
     "default_title": "Essence AI - Article Summarizer",
     "default_popup": "popup/popup.html"
   }
